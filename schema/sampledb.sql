@@ -6,14 +6,12 @@ drop table if exists t_view_point;
 
 drop table if exists t_view_space;
 
-/*==============================================================*/
-/* Table: t_comment_log                                         */
-/*==============================================================*/
 DROP DATABASE IF EXISTS sampledb;
 CREATE DATABASE sampledb DEFAULT CHARACTER SET utf8;
 USE sampledb;
-
-
+/*==============================================================*/
+/* Table: t_comment_log                                         */
+/*==============================================================*/
 create table t_comment_log
 (
    log_id               int not null auto_increment,
@@ -31,15 +29,23 @@ create table t_user
    user_id              int not null auto_increment comment '用户Id',
    user_name            varchar(30) not null comment '用户名',
    password             varchar(30) not null default '' comment '密码',
-   last_login_time      date not null comment '最后登录时间',
-   last_login_ip        varchar(20) not null default '0' comment '最后登录IP',
+   last_visit      date not null comment '最后登录时间',
+   last_ip        varchar(20) not null default '0' comment '最后登录IP',
    primary key (user_id),
    key AK_AK_USER_USER_NAME (user_name)
 )
 ENGINE = InnoDB;
 
-INSERT INTO t_user (user_name, password, last_login_time, last_login_ip) 
-VALUES ('tom', '1234', '2007-12-23', '127.0.0.1');
+/*==============================================================*/
+/* Table: t_login_log                                                */
+/*==============================================================*/
+CREATE TABLE t_login_log (
+  login_log_id int(11) NOT NULL auto_increment,
+  user_id int(11) default NULL,
+  ip varchar(23) default NULL,
+  login_datetime datetime default NULL,
+  PRIMARY KEY  (login_log_id)
+) ENGINE=InnoDB;
 
 /*==============================================================*/
 /* Table: t_view_point                                          */
@@ -71,4 +77,3 @@ create table t_view_space
    notwant_num          int comment '不想去的人数',
    primary key (space_id)
 );
-
