@@ -26,6 +26,7 @@
 			<tx:method name="add*" />
 			<tx:method name="save*" />
 			<tx:method name="remove*" />
+			<tx:method name="delete*" /><!-- zf adds -->
 			<tx:method name="update*" />
 		</tx:attributes>
 	</tx:advice>

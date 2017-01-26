@@ -1,5 +1,6 @@
 package com.smart.domain;
 
+import java.sql.Timestamp;
 import java.util.Date;
 
 import javax.persistence.Column;
@@ -24,7 +25,7 @@ public class LoginLog extends BaseDomain {
 	private int loginLogId;
 	
 	@Column(name = "login_datetime")
-	private Date loginDate;
+	private Timestamp loginDate;
 	
 	@ManyToOne
 	@JoinColumn(name = "user_id")
@@ -49,7 +50,7 @@ public class LoginLog extends BaseDomain {
 	public Date getLoginDate() {
 		return loginDate;
 	}
-	public void setLoginDate(Date loginDate) {
+	public void setLoginDate(Timestamp loginDate) {
 		this.loginDate = loginDate;
 	}
 	public User getUser() {

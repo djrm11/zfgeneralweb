@@ -8,7 +8,7 @@
 <div style="float:left;clear:left;"><a href="<c:url value="/index.jsp"/>">首页</a></div>
 <div style="float:right;clear:right;">
 <c:if test="${!empty USER_CONTEXT.userName}">
-   ${sessionUser.userName},欢迎您的到来,<a href="<c:url value="/login/doLogout.html"/>">注销</a>&nbsp;&nbsp;
+   <%-- ${sessionUser.userName} --%>${USER_CONTEXT.userName},欢迎您的到来,<a href="<c:url value="/login/doLogout.html"/>">注销</a>&nbsp;&nbsp;
    <a href="<c:url value="/vs/index.html"/>">管理景区</a>
 </c:if>
 &nbsp;&nbsp;

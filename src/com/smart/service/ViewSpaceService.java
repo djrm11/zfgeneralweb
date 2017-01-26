@@ -2,6 +2,9 @@ package com.smart.service;
 
 import java.util.List;
 
+import javax.swing.plaf.metal.MetalBorders.Flush3DBorder;
+
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -14,13 +17,14 @@ import com.smart.domain.User;
 import com.smart.domain.ViewPoint;
 import com.smart.domain.ViewSpace;
 import com.smart.service.exception.IpCommentedException;
+import com.smart.web.controller.ViewManageController;
 
 /**
  * 旅游网站的服务类
  */
 @Service
 public class ViewSpaceService {
-
+	private static Logger logger = Logger.getLogger(ViewSpaceService.class);
 	@Autowired
 	protected ViewSpaceDao viewSpaceDao;
 	@Autowired
@@ -43,10 +47,15 @@ public class ViewSpaceService {
 	 */
 	public void deleteViewSpace(int spaceId) {
 		//删除景区相关的评论
+		logger.info("zf removing commentlog");
 		commentLogDao.removeBySpaceId(spaceId);
         //删除景区		
+		logger.info("zf loading viewspace, spaceId: "+spaceId);
 		ViewSpace vs = viewSpaceDao.load(spaceId);
+		logger.info("zf viewspace name is : "+vs.getSpaceName());
+		logger.info("zf removing viewspace");
 		viewSpaceDao.remove(vs);
+		
 		
 	}
 
@@ -91,6 +100,7 @@ public class ViewSpaceService {
 	 */
 	public ViewSpace getFullViewSpace(int spaceId) {
 		ViewSpace vs = viewSpaceDao.get(spaceId);
+		logger.info("zf viewspace.spaceid: "+vs.getSpaceName());
 		if (vs != null) {// 对ViewSpace的关联对象执行延迟加载初始化
 			viewSpaceDao.initialize(vs.getViewPoints());
 			viewSpaceDao.initialize(vs.getUser());

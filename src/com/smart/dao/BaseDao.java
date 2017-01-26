@@ -9,12 +9,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.orm.hibernate3.HibernateTemplate;
 import org.springframework.orm.hibernate3.support.HibernateDaoSupport;
 import org.springframework.stereotype.Repository;
+import org.apache.log4j.Logger;
 import org.hibernate.exception.*;//NestableRuntimeException;
 
 /**
  * DAO基类，其它DAO可以直接继承这个DAO，不但可以复用共用的方法，还可以获得泛型的好处。
  */
 public class BaseDao<T>{
+	private static Logger logger = Logger.getLogger(BaseDao.class);
     private Class<T> entityClass;
     @Autowired
     private HibernateTemplate hibernateTemplate;
@@ -44,7 +46,9 @@ public class BaseDao<T>{
      * @return 返回相应的持久化PO实例
      */
     public T get(Serializable id) {
+    	logger.info("zf get entityClass: "+entityClass);
         return (T) getHibernateTemplate().get(entityClass, id);
+        
     }
 
     /**
@@ -71,7 +75,9 @@ public class BaseDao<T>{
      * @param entity
      */
     public void remove(T entity) {
+    	
         getHibernateTemplate().delete(entity);
+        logger.info("zf remove entity class: "+entity.getClass());
     }
 
     /**
@@ -100,7 +106,7 @@ public class BaseDao<T>{
      * @param params
      * @return 查询结果
      */
-    public List find(String hql, Object... params) {
+	public List find(String hql, Object... params) {
         return this.getHibernateTemplate().find(hql,params);
     }
 
@@ -109,6 +115,7 @@ public class BaseDao<T>{
      * @param entity
      */
     public void initialize(Object entity) {
+    	logger.info("zf initialize entity.getClass(): "+entity.getClass());
         this.getHibernateTemplate().initialize(entity);
     }
     public HibernateTemplate getHibernateTemplate() {

@@ -53,8 +53,7 @@
 	<body>
 		<%@ include file="includeTop.jsp"%>
 		<div>
-			<form action="${context}/vs/${viewSpace.spaceId}/update.html"
-				onsubmit="return mySubmit()"  method="post">
+			<form action="${context}/vs/${viewSpace.spaceId}/update.html" onsubmit="return mySubmit()" method="post">
 				<div>
 					<table border="1px" width="100%">
 						<tr>
@@ -106,7 +105,9 @@
 							</td>
 						</tr>
 					</table>
+				</div>	
 			</form>
+		</div>	
 			<div>
 				<div>
 					<table border="1px" width="100%">
@@ -139,7 +140,7 @@
 						</tr>
 						<c:forEach var="viewPoint" varStatus="status"
 							items="${viewSpace.viewPoints}">
-							<form id="form${status.count}" method="post" action="${context}/vp/${viewPoint.pointId}/delete">
+							<form id="form${status.count}" method="post" action="${context}/vp/${viewPoint.pointId}/delete.html">
 							<tr>
 								<td>
 									${status.count}
@@ -154,7 +155,7 @@
 									${viewPoint.description}
 								</td>
 								<td>
-									<a href="<c:url value="/vp/${viewPoint.pointId}/edit"/>">更改</a>
+									<a href="<c:url value="/vp/${viewPoint.pointId}/edit.html"/>">更改</a>
 									<input type="hidden" name="_method" value="DELETE" />
 									<a href="javascript:document.getElementById('form${status.count}').submit();">删除</a>
 								</td>

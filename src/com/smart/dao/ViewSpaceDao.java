@@ -18,6 +18,7 @@ public class ViewSpaceDao extends BaseDao<ViewSpace> {
 	 * @param name
 	 * @return 风景区名称包括<code>name</code>的所有记录
 	 */
+	@SuppressWarnings("unchecked")
 	public List<ViewSpace> queryByName(String name) {
 		String hql = "from ViewSpace vs where vs.spaceName like ?";
 		name = "%" + name + "%";
@@ -29,6 +30,7 @@ public class ViewSpaceDao extends BaseDao<ViewSpace> {
 	 * @param userId 景区管理员的Id
 	 * @return 
 	 */
+	@SuppressWarnings("unchecked")
 	public List<ViewSpace> queryByUserId(int userId) {
 		String hql = "from ViewSpace vs where vs.user.userId = ?";
 		return (List<ViewSpace>) find(hql, userId);

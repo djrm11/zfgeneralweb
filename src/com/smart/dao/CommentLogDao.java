@@ -1,15 +1,17 @@
 package com.smart.dao;
 import java.util.List;
 
+import org.apache.log4j.Logger;
 import org.springframework.stereotype.Repository;
 
 import com.smart.domain.CommentLog;
+import com.smart.web.controller.ViewManageController;
 /**
  * User对象Dao
  */
 @Repository
 public class CommentLogDao extends BaseDao<CommentLog> {
-	
+	private static Logger logger = Logger.getLogger(CommentLogDao.class);
 	/**
 	 * 判断某一个IP是否已经对id为spaceId的景区进行了评论
 	 * @param spaceId 景区ID
@@ -29,6 +31,7 @@ public class CommentLogDao extends BaseDao<CommentLog> {
 	public void removeBySpaceId(int spaceId){
 		String hql = "from CommentLog c where c.viewSpace.spaceId = ? ";
 		List<CommentLog> commentLogs = (List<CommentLog>)find(hql,spaceId);
+		logger.info("zf remove commentlogs, size: "+commentLogs.size());
 		for (CommentLog commentLog : commentLogs) {
 			remove(commentLog);
 		}

@@ -8,6 +8,7 @@ import java.util.UUID;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -18,6 +19,7 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 import com.smart.domain.CommentLog;
+import com.smart.domain.User;
 import com.smart.domain.ViewPoint;
 import com.smart.domain.ViewSpace;
 import com.smart.service.ViewSpaceService;
@@ -29,21 +31,32 @@ import com.smart.service.exception.IpCommentedException;
  */
 @Controller
 public class ViewManageController extends BaseController{
+	private static Logger logger = Logger.getLogger(ViewManageController.class);
 	@Autowired
 	private ViewSpaceService viewSpaceService;
 
 	// 显示所有景区的列表
-	@RequestMapping(value = "/index", method = RequestMethod.GET)  
+	@RequestMapping(value = "/index.html", method = RequestMethod.GET)  
 	public String listViewSpaces(HttpServletRequest request) {
 		List<ViewSpace> viewSpaces = viewSpaceService.getAllViewSpaces();
 		request.setAttribute("viewSpaces", viewSpaces);
-		return "/listViewSpaces";
+		return "listViewSpaces";
 	}
 
 	// 显示所有景区的列表
-	@RequestMapping(value = "/vs/index", method = RequestMethod.GET)  
+	@RequestMapping(value = "/vs/index.html", method = RequestMethod.GET)  
 	public String listUserViewSpaces(HttpServletRequest request) {
-		int userId = super.getSessionUser(request).getUserId();
+		int userId = 0;
+		try{
+			User user = super.getSessionUser(request);
+			userId = user.getUserId();
+			logger.debug("zf userId: "+userId+" username: "+user.getUserName());
+		}catch (Exception e) {
+			request.setAttribute(ERROR_MSG_KEY, "登录超时，请重新登录。");
+			logger.info("zf Exception: "+e);
+//			return "/fail";
+			throw new RuntimeException("登录超时，请重新登录。");
+		}
 		List<ViewSpace> viewSpaces = viewSpaceService
 				.queryViewSpaceByUserId(userId);
 		request.setAttribute("viewSpaces", viewSpaces);
@@ -51,7 +64,7 @@ public class ViewManageController extends BaseController{
 	}
 
 	// 根据名称模糊查询景区
-	@RequestMapping(value = "/search",method=RequestMethod.PUT)
+	@RequestMapping(value = "/search.html",method=RequestMethod.PUT)
 	public String queryViewSpaces(HttpServletRequest request) {
 		String spaceName = request.getParameter("spaceName");
 		List<ViewSpace> viewSpaces = viewSpaceService
@@ -61,7 +74,7 @@ public class ViewManageController extends BaseController{
 	}
 
 	// 显示景区的详细信息
-	@RequestMapping(value = "/vs/{id}", method = RequestMethod.GET)
+	@RequestMapping(value = "/vs/{id}.html", method = RequestMethod.GET)
 	public String showViewSpace(@PathVariable Integer id,HttpServletRequest request) {
 		ViewSpace viewSpace = viewSpaceService.getFullViewSpace(id);
 		request.setAttribute("viewSpace", viewSpace);
@@ -69,22 +82,22 @@ public class ViewManageController extends BaseController{
 	}
 
 	// 打开新添景区页面
-	@RequestMapping(value = "/vs/add", method = RequestMethod.GET)
+	@RequestMapping(value = "/vs/add.html", method = RequestMethod.GET)
 	public String addViewSpacePage() {
 		return "/addViewSpace";
 	}
 
 	//新添景区
-	@RequestMapping(value = "/vs/save", method=RequestMethod.PUT)  
+	@RequestMapping(value = "/vs/save.html", method=RequestMethod.PUT)  
 	public String addViewSpace(HttpServletRequest request,ViewSpace viewSpace) {
 		viewSpace.setUser(getSessionUser(request));
 		viewSpaceService.addViewSpace(viewSpace);
-		String targetUrl = "/vs/index";
+		String targetUrl = "/vs/index.html";
         return "redirect:"+targetUrl;
 	}
 
 	// 打开更改景区页面
-	@RequestMapping(value="/vs/{id}/edit")  
+	@RequestMapping(value="/vs/{id}/edit.html")  
 	public String updateViewSpacePage(@PathVariable Integer id,HttpServletRequest request) {
 		ViewSpace viewSpace = viewSpaceService.getFullViewSpace(id);
 		request.setAttribute("viewSpace", viewSpace);
@@ -92,31 +105,33 @@ public class ViewManageController extends BaseController{
 	}
 
 	// 更改景区
-	@RequestMapping(value="/vs/{id}/update",method=RequestMethod.PUT)  
+	@RequestMapping(value="/vs/{id}/update.html",method=RequestMethod.PUT)  
 	public String updateViewSpace(@PathVariable Integer id,HttpServletRequest request, ViewSpace vs) {
 		vs.setUser(getSessionUser(request));
 		vs.setSpaceId(id);
 		viewSpaceService.updateViewSpace(vs);
-		String targetUrl = "/vs/index";
+		String targetUrl = "/vs/index.html";
+//		String targetUrl = "/updateViewSpace";
         return "redirect:"+targetUrl;
 	}
 
 	// 删除景区
-	@RequestMapping(value="/vs/{id}/delete",method=RequestMethod.DELETE)  
+	@RequestMapping(value="/vs/{id}/delete.html",method=RequestMethod.DELETE)  
 	public String deleteViewSpace(@PathVariable Integer id) {
 		viewSpaceService.deleteViewSpace(id);
-		String targetUrl = "/vs/index";
+		String targetUrl = "/vs/index.html";
         return "redirect:"+targetUrl;
 	}
 
 	// 对景区的评论
-	@RequestMapping(value="/vs/comment/{id}/{commentType}",method=RequestMethod.GET)  
+	@RequestMapping(value="/vs/comment/{id}/{commentType}.html",method=RequestMethod.GET)  
 	public String commentViewSpace(@PathVariable Integer id,@PathVariable Integer commentType,HttpServletRequest request) {
 		if(id == null){
 		   return "/fail";	
 		}
 		CommentLog cl = new CommentLog();
 		cl.setIp(request.getRemoteAddr());
+		logger.debug("zf Entering into method commentViewSpace,request.getRemoteAddr():"+request.getRemoteAddr());
 		cl.setCommentType(commentType);
 		ViewSpace vs = new ViewSpace();
 		vs.setSpaceId(Integer.valueOf(id));
@@ -127,12 +142,12 @@ public class ViewManageController extends BaseController{
 			request.setAttribute(ERROR_MSG_KEY, "您已经评论过该景区了。");
 			return "/fail";
 		}
-        String targetUrl = "/vs/" + id;
+        String targetUrl = "/vs/" + id+".html";
         return "redirect:"+targetUrl;
 	}
 
 	// 打开添加景区的景点的页面
-	@RequestMapping(value = "/vp/{id}/add", method = RequestMethod.GET)
+	@RequestMapping(value = "/vp/{id}/add.html", method = RequestMethod.GET)
 	public String addViewPointPage(@PathVariable Integer id,HttpServletRequest request) {
 		ViewSpace vs = new ViewSpace();
 		vs.setSpaceId(id);
@@ -141,7 +156,7 @@ public class ViewManageController extends BaseController{
 	}
 
 	// 添加景区的景点
-	@RequestMapping(value = "/vp/save", method = RequestMethod.POST)
+	@RequestMapping(value = "/vp/save.html", method = RequestMethod.POST)
 	public String addViewPoint(MultipartHttpServletRequest request, @RequestParam("spaceId") int spaceId,
 			@RequestParam("pointName") String pointName,
 			@RequestParam("ticketPrice") float ticketPrice,
@@ -174,7 +189,7 @@ public class ViewManageController extends BaseController{
 			throw new RuntimeException(e);
 		}
 		viewSpaceService.addViewPoint(vp);
-        String targetUrl = "/vs/" + spaceId  + "/edit";
+        String targetUrl = "/vs/" + spaceId  + "/edit.html";
         return "redirect:"+targetUrl;
 	}
 
@@ -185,17 +200,18 @@ public class ViewManageController extends BaseController{
 	}
 
 	// 删除景区的景点
-	@RequestMapping(value="/vp/{id}/delete",method=RequestMethod.DELETE)  
+	@RequestMapping(value="/vp/{id}/delete.html",method=RequestMethod.DELETE)  
 	public String deleteViewPoint(@PathVariable Integer id) {
 		ViewPoint vp = viewSpaceService.getFullViewPoint(id);
 		int spaceId = vp.getViewSpace().getSpaceId();
+		logger.info("zf deleting viewpoint,viewpoint id: "+id);
 		viewSpaceService.deleteViewPoint(id);
-        String targetUrl = "/vs/" + spaceId  + "/edit";
+        String targetUrl = "/vs/" + spaceId  + "/edit.html";
         return "redirect:"+targetUrl;
 	}
 
 	//更改景点的页面
-	@RequestMapping(value="/vp/{id}/edit",method=RequestMethod.GET) 
+	@RequestMapping(value="/vp/{id}/edit.html",method=RequestMethod.GET) 
 	public String updateViewPointPage(@PathVariable Integer id,HttpServletRequest request) {
 		ViewPoint vp = viewSpaceService.getFullViewPoint(id);
 		request.setAttribute("viewPoint", vp);
@@ -239,7 +255,7 @@ public class ViewManageController extends BaseController{
 			throw new RuntimeException(e);
 		}
 		viewSpaceService.updateViewPoint(vp);
-        String targetUrl = "/vs/" + vp.getViewSpace().getSpaceId()  + "/edit";
+        String targetUrl = "/vs/" + vp.getViewSpace().getSpaceId()  + "/edit.html";
         return "redirect:"+targetUrl;
 	}
 }

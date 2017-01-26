@@ -1,11 +1,15 @@
 package com.smart.web.controller;
-import java.util.Date;
+import java.sql.Timestamp;
+import java.util.Calendar;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import com.smart.cons.CommonConstant;
 import com.smart.service.UserService;
+
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -25,6 +29,7 @@ import com.smart.domain.User;
 @Controller
 @RequestMapping("/login")
 public class LoginController extends BaseController {
+	private static Logger logger = Logger.getLogger(LoginController.class);
 	/**
 	 * 自动注入
 	 */
@@ -39,7 +44,7 @@ public class LoginController extends BaseController {
 	 * @param response
 	 * @return
 	 */
-    @RequestMapping("/doLogin")
+    @RequestMapping("/doLogin.html")
 	public ModelAndView login(HttpServletRequest request, HttpServletResponse response) {
 		String userName = request.getParameter("userName");
 		String password = request.getParameter("password");
@@ -52,9 +57,16 @@ public class LoginController extends BaseController {
 			return new ModelAndView("forward:/login.jsp");
 		} else {
             user.setLastIp(request.getLocalAddr());
-            user.setLastVisit(new Date());
+            user.setLastVisit(new Timestamp(Calendar.getInstance().getTimeInMillis()));
             userService.saveLoginInfo(user);
 			setSessionUser(request,user);
+			logger.debug("zf webapp.root:"+System.getProperty("webapp.root"));
+			logger.debug("zf zfgeneralweb.root:"+System.getProperty("zfgeneralweb.root"));
+//			System.out.println("@@@@@@@@@@@@@@@@@@@@@@@@@@@"+this.getClass().getResource(""));			
+//			System.out.println("@@@@@@@@@@@@@@@@@@@@@@@@@@@"+this.getClass().getResource("/")); 
+//			System.out.println("@@@@@@@@@@@@@@@@@@@@@@@@@@@"+this.getClass() .getClassLoader().getResource(""));
+//			System.out.println("@@@@@@@@@@@@@@@@@@@@@@@@@@@"+ClassLoader.getSystemResource(""));			
+//			System.out.println("@@@@@@@@@@@@@@@@@@@@@@@@@@@"+Thread.currentThread().getContextClassLoader ().getResource(""));
 			return new ModelAndView("success");
 		}
 	}

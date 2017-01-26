@@ -1,6 +1,8 @@
 package com.smart.domain;
 
 import javax.persistence.*;
+
+import java.sql.Timestamp;
 import java.util.Date;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
@@ -9,7 +11,8 @@ import org.hibernate.annotations.CacheConcurrencyStrategy;
 @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 @Table(name = "t_user")
 public class User extends BaseDomain {
-    @Id
+
+	@Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "user_id")
     protected int userId;
@@ -20,7 +23,7 @@ public class User extends BaseDomain {
     protected String password;
 
     @Column(name = "last_visit")
-    protected Date lastVisit;
+    protected Timestamp lastVisit;
 
     @Column(name = "last_ip")
     protected String lastIp;
@@ -49,11 +52,11 @@ public class User extends BaseDomain {
         this.password = password;
     }
 
-    public Date getLastVisit() {
+    public Timestamp getLastVisit() {
         return lastVisit;
     }
 
-    public void setLastVisit(Date lastVisit) {
+    public void setLastVisit(Timestamp lastVisit) {
         this.lastVisit = lastVisit;
     }
 

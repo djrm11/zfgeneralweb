@@ -4,6 +4,7 @@
         <wb-resource deploy-path="/" source-path="/WebRoot"/>
         <wb-resource deploy-path="/WEB-INF/classes" source-path="/src"/>
         <wb-resource deploy-path="/WEB-INF/classes" source-path="/resources"/>
+        <wb-resource deploy-path="/WEB-INF/classes" source-path="/schema"/>
         <property name="context-root" value="/zfgeneralweb"/>
         <property name="java-output-path" value="/zfgeneralweb/WebRoot/WEB-INF/classes"/>
     </wb-module>
